@@ -321,10 +321,8 @@
       noBtn.style.left = newX + 'px';
       noBtn.style.top = newY + 'px';
 
-      // Le bouton "J'accepte" grossit, sans jamais déborder de l'écran
-      const baseW = yesBtn.offsetWidth / yesScale;
-      const maxScale = Math.max(1.2, (vp.w - 2 * margin) / baseW);
-      yesScale = Math.min(yesScale + 0.18, maxScale, 2.6);
+      // Le bouton "J'accepte" grossit sans jamais s'arrêter
+      yesScale += 0.22;
       yesBtn.style.transform = 'scale(' + yesScale + ')';
     }
 
