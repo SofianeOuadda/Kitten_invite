@@ -134,6 +134,8 @@
       color: #fff;
       box-shadow: 0 8px 20px rgba(255, 94, 156, 0.4);
       transform-origin: center;
+      position: relative;
+      z-index: 10;
     }
 
     #yesBtn:hover {
@@ -228,13 +230,28 @@
       30%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(18deg); }
       100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25) rotate(18deg); }
     }
+
+    /* Humeur du chaton : transitions douces */
+    #mouth { transition: d 0.4s ease; }
+    #browL, #browR, #blushL, #blushR, #eyeL, #eyeR {
+      transition: opacity 0.4s ease, ry 0.4s ease;
+    }
+    /* Larmes qui coulent quand le chaton est triste */
+    .kitten.crying .tear {
+      animation: tear-fall 1.1s ease-in infinite;
+    }
+    @keyframes tear-fall {
+      0%   { opacity: 0.9; transform: translateY(0); }
+      80%  { opacity: 0.7; }
+      100% { opacity: 0; transform: translateY(18px); }
+    }
   </style>
 </head>
 <body>
 
   <div class="card" id="mainCard">
     <!-- Chaton gris mignon en SVG -->
-    <svg class="kitten" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+    <svg class="kitten" id="kitten" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
       <!-- oreilles -->
       <path d="M55 70 L40 28 L85 55 Z" fill="#9aa0a6"/>
       <path d="M145 70 L160 28 L115 55 Z" fill="#9aa0a6"/>
@@ -244,23 +261,31 @@
       <ellipse cx="100" cy="110" rx="62" ry="56" fill="#b0b6bc"/>
       <!-- joues plus claires -->
       <ellipse cx="100" cy="120" rx="50" ry="44" fill="#c3c8cd"/>
+      <!-- joues roses (bonheur, cachées par défaut) -->
+      <ellipse id="blushL" cx="64" cy="122" rx="12" ry="7" fill="#ff9ec4" opacity="0"/>
+      <ellipse id="blushR" cx="136" cy="122" rx="12" ry="7" fill="#ff9ec4" opacity="0"/>
+      <!-- sourcils tristes (cachés par défaut) -->
+      <line id="browL" x1="68" y1="84" x2="90" y2="92" stroke="#5a5f64" stroke-width="3.5" stroke-linecap="round" opacity="0"/>
+      <line id="browR" x1="132" y1="84" x2="110" y2="92" stroke="#5a5f64" stroke-width="3.5" stroke-linecap="round" opacity="0"/>
       <!-- yeux -->
-      <ellipse cx="78" cy="104" rx="11" ry="13" fill="#3a3f44"/>
-      <ellipse cx="122" cy="104" rx="11" ry="13" fill="#3a3f44"/>
+      <ellipse id="eyeL" cx="78" cy="104" rx="11" ry="13" fill="#3a3f44"/>
+      <ellipse id="eyeR" cx="122" cy="104" rx="11" ry="13" fill="#3a3f44"/>
       <circle cx="81" cy="100" r="3.5" fill="#fff"/>
       <circle cx="125" cy="100" r="3.5" fill="#fff"/>
+      <!-- larmes (cachées par défaut) -->
+      <ellipse id="tearL" class="tear" cx="74" cy="118" rx="4" ry="6" fill="#7ec8ff" opacity="0"/>
+      <ellipse id="tearR" class="tear" cx="126" cy="118" rx="4" ry="6" fill="#7ec8ff" opacity="0"/>
       <!-- museau -->
       <path d="M93 122 L107 122 L100 130 Z" fill="#f7849f"/>
-      <!-- bouche -->
-      <path d="M100 130 Q92 138 84 132" stroke="#5a5f64" stroke-width="2.5" fill="none" stroke-linecap="round"/>
-      <path d="M100 130 Q108 138 116 132" stroke="#5a5f64" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- bouche (modifiée par JS : sourire <-> triste) -->
+      <path id="mouth" d="M86 130 Q100 140 114 130" stroke="#5a5f64" stroke-width="2.5" fill="none" stroke-linecap="round"/>
       <!-- moustaches -->
       <line x1="70" y1="124" x2="38" y2="118" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
       <line x1="70" y1="130" x2="40" y2="132" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
       <line x1="130" y1="124" x2="162" y2="118" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
       <line x1="130" y1="130" x2="160" y2="132" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
-      <!-- petit coeur sur la tête -->
-      <text x="100" y="58" font-size="20" text-anchor="middle">💕</text>
+      <!-- emoji sur la tête (change selon l'humeur) -->
+      <text id="headEmoji" x="100" y="58" font-size="20" text-anchor="middle">💕</text>
     </svg>
 
     <div id="question">
@@ -307,7 +332,7 @@
         noBtn.style.margin = '0';
         noBtn.style.left = btnRect.left + 'px';
         noBtn.style.top = btnRect.top + 'px';
-        noBtn.style.zIndex = 5;
+        noBtn.style.zIndex = 1;
         // Force un reflow pour que la 1ère transition parte de la position actuelle
         void noBtn.offsetWidth;
       }
@@ -324,6 +349,9 @@
       // Le bouton "J'accepte" grossit sans jamais s'arrêter
       yesScale += 0.22;
       yesBtn.style.transform = 'scale(' + yesScale + ')';
+
+      // Le chaton devient de plus en plus triste
+      makeSadder();
     }
 
     // Se déplace uniquement au clic
@@ -339,6 +367,7 @@
 
     // Clic sur "J'accepte" -> célébration
     yesBtn.addEventListener('click', function () {
+      makeHappy();
       question.style.display = 'none';
       celebration.style.display = 'flex';
       noBtn.style.display = 'none';
@@ -368,6 +397,126 @@
 
     // ===== Chaton interactif : la patte qui griffe =====
     const kitten = document.querySelector('.kitten');
+
+    // Éléments d'expression
+    const mouth = document.getElementById('mouth');
+    const browL = document.getElementById('browL');
+    const browR = document.getElementById('browR');
+    const tearL = document.getElementById('tearL');
+    const tearR = document.getElementById('tearR');
+    const blushL = document.getElementById('blushL');
+    const blushR = document.getElementById('blushR');
+    const eyeL = document.getElementById('eyeL');
+    const eyeR = document.getElementById('eyeR');
+    const headEmoji = document.getElementById('headEmoji');
+
+    let sadCount = 0;
+
+    // Rend le chaton de plus en plus triste à chaque "Non"
+    function makeSadder() {
+      sadCount++;
+      const s = Math.min(sadCount * 0.16, 1); // 0 = neutre, 1 = très triste
+
+      // bouche : sourire -> moue triste
+      const ctrlY = 140 - s * 26;   // 140 (sourire) -> 114 (triste)
+      const endY = 130 + s * 4;
+      mouth.setAttribute('d', 'M86 ' + endY + ' Q100 ' + ctrlY + ' 114 ' + endY);
+
+      // sourcils tristes qui apparaissent
+      browL.setAttribute('opacity', s);
+      browR.setAttribute('opacity', s);
+
+      // joues roses disparaissent, plus de bonheur
+      blushL.setAttribute('opacity', 0);
+      blushR.setAttribute('opacity', 0);
+
+      // larmes à partir d'un certain niveau de tristesse
+      if (s >= 0.32) {
+        tearL.setAttribute('opacity', 0.9);
+        tearR.setAttribute('opacity', 0.9);
+        kitten.classList.add('crying');
+      }
+      headEmoji.textContent = s >= 0.5 ? '💧' : '💕';
+    }
+
+    // Chaton tout content quand elle accepte
+    function makeHappy() {
+      sadCount = 0;
+      kitten.classList.remove('crying');
+      mouth.setAttribute('d', 'M80 124 Q100 152 120 124'); // grand sourire
+      browL.setAttribute('opacity', 0);
+      browR.setAttribute('opacity', 0);
+      tearL.setAttribute('opacity', 0);
+      tearR.setAttribute('opacity', 0);
+      blushL.setAttribute('opacity', 0.85);
+      blushR.setAttribute('opacity', 0.85);
+      eyeL.setAttribute('ry', 8);  // yeux plissés de joie
+      eyeR.setAttribute('ry', 8);
+      headEmoji.textContent = '💖';
+    }
+
+    // ===== Miaou synthétisé par formants (hors-ligne, sans fichier) =====
+    let audioCtx = null;
+    function playMeow() {
+      try {
+        const AC = window.AudioContext || window.webkitAudioContext;
+        if (!AC) return;
+        audioCtx = audioCtx || new AC();
+        if (audioCtx.state === 'suspended') audioCtx.resume();
+
+        const t = audioCtx.currentTime;
+        const dur = 0.52;
+
+        // Source glottique (cordes vocales du chaton) : aiguë
+        const osc = audioCtx.createOscillator();
+        osc.type = 'sawtooth';
+        osc.frequency.setValueAtTime(780, t);
+        osc.frequency.linearRampToValueAtTime(1180, t + 0.12); // montée "mi" (aiguë)
+        osc.frequency.linearRampToValueAtTime(980, t + 0.30);
+        osc.frequency.linearRampToValueAtTime(720, t + dur);    // descente "ow"
+
+        // Vibrato (donne le côté vivant/plaintif)
+        const lfo = audioCtx.createOscillator();
+        const lfoGain = audioCtx.createGain();
+        lfo.frequency.value = 22;
+        lfoGain.gain.value = 30;
+        lfo.connect(lfoGain);
+        lfoGain.connect(osc.frequency);
+
+        // Deux formants qui balaient la voyelle "iii -> aaa -> ooow"
+        const f1 = audioCtx.createBiquadFilter();
+        f1.type = 'bandpass';
+        f1.Q.value = 8;
+        f1.frequency.setValueAtTime(450, t);          // i
+        f1.frequency.linearRampToValueAtTime(1050, t + 0.28); // a
+        f1.frequency.linearRampToValueAtTime(650, t + dur);  // o
+
+        const f2 = audioCtx.createBiquadFilter();
+        f2.type = 'bandpass';
+        f2.Q.value = 10;
+        f2.frequency.setValueAtTime(3000, t);          // i
+        f2.frequency.linearRampToValueAtTime(1900, t + 0.28); // a
+        f2.frequency.linearRampToValueAtTime(1250, t + dur);   // o
+
+        const f1g = audioCtx.createGain(); f1g.gain.value = 1.0;
+        const f2g = audioCtx.createGain(); f2g.gain.value = 0.7;
+
+        // Enveloppe de volume
+        const out = audioCtx.createGain();
+        out.gain.setValueAtTime(0.0001, t);
+        out.gain.exponentialRampToValueAtTime(0.32, t + 0.06);
+        out.gain.setValueAtTime(0.32, t + 0.30);
+        out.gain.exponentialRampToValueAtTime(0.0001, t + dur);
+
+        osc.connect(f1); f1.connect(f1g); f1g.connect(out);
+        osc.connect(f2); f2.connect(f2g); f2g.connect(out);
+        out.connect(audioCtx.destination);
+
+        osc.start(t);  lfo.start(t);
+        osc.stop(t + dur + 0.05);
+        lfo.stop(t + dur + 0.05);
+      } catch (e) { /* audio non dispo : on ignore */ }
+    }
 
     const PAW_SVG =
       '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
@@ -419,6 +568,7 @@
         x = e.clientX;
         y = e.clientY;
       }
+      playMeow();
       clawAt(x, y);
     }
 
