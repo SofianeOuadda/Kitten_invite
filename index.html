@@ -1,0 +1,434 @@
+<!DOCTYPE html>
+<html lang="fr">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+  <meta name="theme-color" content="#ff5e9c" />
+  <meta name="apple-mobile-web-app-capable" content="yes" />
+  <meta name="format-detection" content="telephone=no" />
+  <title>Une invitation pour toi... 💕</title>
+  <style>
+    :root {
+      --pink: #ff7eb3;
+      --pink-deep: #ff5e9c;
+      --bg1: #ffe6f0;
+      --bg2: #fff0f6;
+    }
+
+    * { box-sizing: border-box; }
+
+    html, body {
+      margin: 0;
+      height: 100%;
+      font-family: "Segoe UI", "Helvetica Neue", Arial, sans-serif;
+      -webkit-text-size-adjust: 100%;
+    }
+
+    body {
+      min-height: 100vh;
+      min-height: 100dvh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: linear-gradient(135deg, var(--bg1), var(--bg2));
+      overflow: hidden;
+      position: relative;
+      padding: 20px;
+      padding: max(20px, env(safe-area-inset-top)) 20px max(20px, env(safe-area-inset-bottom));
+      overscroll-behavior: none;
+    }
+
+    /* Coeurs flottants en arrière-plan */
+    .heart-bg {
+      position: fixed;
+      bottom: -40px;
+      font-size: 24px;
+      opacity: 0.6;
+      animation: float-up linear infinite;
+      user-select: none;
+      pointer-events: none;
+      z-index: 1;
+    }
+
+    @keyframes float-up {
+      0%   { transform: translateY(0) rotate(0deg); opacity: 0; }
+      10%  { opacity: 0.7; }
+      90%  { opacity: 0.7; }
+      100% { transform: translateY(-110vh) rotate(360deg); opacity: 0; }
+    }
+
+    .card {
+      position: relative;
+      z-index: 2;
+      background: #fff;
+      border-radius: 28px;
+      padding: 40px 32px 48px;
+      max-width: 460px;
+      width: 100%;
+      text-align: center;
+      box-shadow: 0 20px 60px rgba(255, 94, 156, 0.25);
+      animation: pop-in 0.6s cubic-bezier(0.18, 0.89, 0.32, 1.28);
+    }
+
+    @keyframes pop-in {
+      0%   { transform: scale(0.7); opacity: 0; }
+      100% { transform: scale(1); opacity: 1; }
+    }
+
+    h1 {
+      color: var(--pink-deep);
+      font-size: 28px;
+      margin: 18px 0 6px;
+    }
+
+    p.subtitle {
+      color: #8a6b78;
+      font-size: 16px;
+      margin: 0 0 28px;
+    }
+
+    /* Le chaton */
+    .kitten {
+      width: 180px;
+      height: 180px;
+      margin: 0 auto;
+      animation: bob 3s ease-in-out infinite;
+    }
+
+    @keyframes bob {
+      0%, 100% { transform: translateY(0); }
+      50%      { transform: translateY(-10px); }
+    }
+
+    .buttons {
+      position: relative;
+      margin-top: 8px;
+      min-height: 80px;
+      display: flex;
+      gap: 16px;
+      align-items: center;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    button {
+      border: none;
+      cursor: pointer;
+      font-size: 18px;
+      font-weight: 700;
+      padding: 14px 30px;
+      border-radius: 50px;
+      transition: transform 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  font-size 0.45s ease,
+                  padding 0.45s ease,
+                  box-shadow 0.3s ease;
+      font-family: inherit;
+      -webkit-tap-highlight-color: transparent;
+      -webkit-user-select: none;
+      user-select: none;
+      touch-action: manipulation;
+    }
+
+    #yesBtn {
+      background: linear-gradient(135deg, var(--pink), var(--pink-deep));
+      color: #fff;
+      box-shadow: 0 8px 20px rgba(255, 94, 156, 0.4);
+      transform-origin: center;
+    }
+
+    #yesBtn:hover {
+      box-shadow: 0 12px 28px rgba(255, 94, 156, 0.55);
+    }
+
+    #noBtn {
+      background: #f0f0f3;
+      color: #888;
+      position: relative;
+      transition: left 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  top 0.45s cubic-bezier(0.22, 1, 0.36, 1),
+                  transform 0.3s ease,
+                  box-shadow 0.3s ease;
+    }
+
+    /* Écran de confirmation */
+    .celebration {
+      display: none;
+      flex-direction: column;
+      align-items: center;
+    }
+
+    .celebration h1 {
+      font-size: 32px;
+    }
+
+    .big-heart {
+      font-size: 90px;
+      animation: beat 0.8s ease-in-out infinite;
+    }
+
+    @keyframes beat {
+      0%, 100% { transform: scale(1); }
+      50%      { transform: scale(1.2); }
+    }
+
+    /* Adaptation aux petits écrans (téléphones) */
+    @media (max-width: 480px) {
+      .card {
+        padding: 32px 22px 40px;
+        border-radius: 22px;
+      }
+      h1 { font-size: 24px; }
+      .celebration h1 { font-size: 27px; }
+      p.subtitle { font-size: 15px; }
+      .kitten { width: 150px; height: 150px; }
+      button { font-size: 17px; padding: 13px 26px; }
+      .big-heart { font-size: 76px; }
+    }
+
+    /* Chaton interactif : patte qui griffe */
+    .kitten {
+      cursor: pointer;
+      -webkit-tap-highlight-color: transparent;
+    }
+
+    .kitten.wiggle {
+      animation: wiggle 0.45s ease;
+    }
+    @keyframes wiggle {
+      0%, 100% { transform: rotate(0deg); }
+      20%      { transform: rotate(-9deg) scale(1.04); }
+      45%      { transform: rotate(7deg); }
+      70%      { transform: rotate(-4deg); }
+    }
+
+    .paw {
+      position: fixed;
+      width: 64px;
+      height: 64px;
+      pointer-events: none;
+      z-index: 60;
+      animation: paw-swipe 0.55s ease forwards;
+    }
+    .paw svg { width: 100%; height: 100%; display: block; }
+    @keyframes paw-swipe {
+      0%   { transform: translate(-50%, -50%) scale(0.2) rotate(-40deg); opacity: 0; }
+      35%  { transform: translate(-50%, -50%) scale(1.15) rotate(-8deg); opacity: 1; }
+      62%  { transform: translate(-50%, -50%) scale(1) rotate(18deg); opacity: 1; }
+      100% { transform: translate(-50%, -50%) scale(0.4) rotate(-30deg); opacity: 0; }
+    }
+
+    .scratch {
+      position: fixed;
+      pointer-events: none;
+      z-index: 59;
+      animation: scratch-flash 0.5s ease forwards;
+    }
+    @keyframes scratch-flash {
+      0%   { opacity: 0; transform: translate(-50%, -50%) scale(0.5) rotate(18deg); }
+      30%  { opacity: 1; transform: translate(-50%, -50%) scale(1) rotate(18deg); }
+      100% { opacity: 0; transform: translate(-50%, -50%) scale(1.25) rotate(18deg); }
+    }
+  </style>
+</head>
+<body>
+
+  <div class="card" id="mainCard">
+    <!-- Chaton gris mignon en SVG -->
+    <svg class="kitten" viewBox="0 0 200 200" xmlns="http://www.w3.org/2000/svg">
+      <!-- oreilles -->
+      <path d="M55 70 L40 28 L85 55 Z" fill="#9aa0a6"/>
+      <path d="M145 70 L160 28 L115 55 Z" fill="#9aa0a6"/>
+      <path d="M58 64 L50 40 L78 56 Z" fill="#f7c8d8"/>
+      <path d="M142 64 L150 40 L122 56 Z" fill="#f7c8d8"/>
+      <!-- tête -->
+      <ellipse cx="100" cy="110" rx="62" ry="56" fill="#b0b6bc"/>
+      <!-- joues plus claires -->
+      <ellipse cx="100" cy="120" rx="50" ry="44" fill="#c3c8cd"/>
+      <!-- yeux -->
+      <ellipse cx="78" cy="104" rx="11" ry="13" fill="#3a3f44"/>
+      <ellipse cx="122" cy="104" rx="11" ry="13" fill="#3a3f44"/>
+      <circle cx="81" cy="100" r="3.5" fill="#fff"/>
+      <circle cx="125" cy="100" r="3.5" fill="#fff"/>
+      <!-- museau -->
+      <path d="M93 122 L107 122 L100 130 Z" fill="#f7849f"/>
+      <!-- bouche -->
+      <path d="M100 130 Q92 138 84 132" stroke="#5a5f64" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <path d="M100 130 Q108 138 116 132" stroke="#5a5f64" stroke-width="2.5" fill="none" stroke-linecap="round"/>
+      <!-- moustaches -->
+      <line x1="70" y1="124" x2="38" y2="118" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
+      <line x1="70" y1="130" x2="40" y2="132" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
+      <line x1="130" y1="124" x2="162" y2="118" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
+      <line x1="130" y1="130" x2="160" y2="132" stroke="#8a8f94" stroke-width="2" stroke-linecap="round"/>
+      <!-- petit coeur sur la tête -->
+      <text x="100" y="58" font-size="20" text-anchor="middle">💕</text>
+    </svg>
+
+    <div id="question">
+      <h1>Une invitation pour toi 🥰</h1>
+      <p class="subtitle">M'accompagnerais-tu au restaurant le <strong>15 juin</strong> pour fêter ton anniversaire ? 🍽️💕</p>
+
+      <div class="buttons" id="btnArea">
+        <button id="yesBtn">J'accepte 💖</button>
+        <button id="noBtn">Non</button>
+      </div>
+    </div>
+
+    <div class="celebration" id="celebration">
+      <div class="big-heart">💖</div>
+      <h1>Youpiii ! 🎉</h1>
+      <p class="subtitle">Rendez-vous le <strong>15 juin</strong> ! J'ai hâte de fêter ça avec toi... 😻🥂</p>
+    </div>
+  </div>
+
+  <script>
+    const noBtn = document.getElementById('noBtn');
+    const yesBtn = document.getElementById('yesBtn');
+    const btnArea = document.getElementById('btnArea');
+    const question = document.getElementById('question');
+    const celebration = document.getElementById('celebration');
+
+    let yesScale = 1;
+
+    function viewportSize() {
+      const vv = window.visualViewport;
+      return {
+        w: vv ? vv.width : window.innerWidth,
+        h: vv ? vv.height : window.innerHeight
+      };
+    }
+
+    // Déplacement fluide du bouton "Non"
+    function dodge() {
+      const btnRect = noBtn.getBoundingClientRect();
+      const vp = viewportSize();
+
+      if (noBtn.style.position !== 'fixed') {
+        noBtn.style.position = 'fixed';
+        noBtn.style.margin = '0';
+        noBtn.style.left = btnRect.left + 'px';
+        noBtn.style.top = btnRect.top + 'px';
+        noBtn.style.zIndex = 5;
+        // Force un reflow pour que la 1ère transition parte de la position actuelle
+        void noBtn.offsetWidth;
+      }
+
+      const margin = 14;
+      const maxX = Math.max(margin, vp.w - btnRect.width - margin);
+      const maxY = Math.max(margin, vp.h - btnRect.height - margin);
+      const newX = margin + Math.random() * (maxX - margin);
+      const newY = margin + Math.random() * (maxY - margin);
+
+      noBtn.style.left = newX + 'px';
+      noBtn.style.top = newY + 'px';
+
+      // Le bouton "J'accepte" grossit, sans jamais déborder de l'écran
+      const baseW = yesBtn.offsetWidth / yesScale;
+      const maxScale = Math.max(1.2, (vp.w - 2 * margin) / baseW);
+      yesScale = Math.min(yesScale + 0.18, maxScale, 2.6);
+      yesBtn.style.transform = 'scale(' + yesScale + ')';
+    }
+
+    // Se déplace uniquement au clic
+    noBtn.addEventListener('click', function (e) {
+      e.preventDefault();
+      dodge();
+    });
+    // Pour mobile / tactile
+    noBtn.addEventListener('touchstart', function (e) {
+      e.preventDefault();
+      dodge();
+    }, { passive: false });
+
+    // Clic sur "J'accepte" -> célébration
+    yesBtn.addEventListener('click', function () {
+      question.style.display = 'none';
+      celebration.style.display = 'flex';
+      noBtn.style.display = 'none';
+      launchHearts(40);
+    });
+
+    // Coeurs flottants
+    function spawnHeart() {
+      const h = document.createElement('div');
+      h.className = 'heart-bg';
+      const hearts = ['💕', '💖', '💗', '🩷', '❤️'];
+      h.textContent = hearts[Math.floor(Math.random() * hearts.length)];
+      h.style.left = Math.random() * 100 + 'vw';
+      h.style.fontSize = (16 + Math.random() * 24) + 'px';
+      const dur = 6 + Math.random() * 6;
+      h.style.animationDuration = dur + 's';
+      document.body.appendChild(h);
+      setTimeout(() => h.remove(), dur * 1000);
+    }
+    setInterval(spawnHeart, 600);
+
+    function launchHearts(n) {
+      for (let i = 0; i < n; i++) {
+        setTimeout(spawnHeart, i * 80);
+      }
+    }
+
+    // ===== Chaton interactif : la patte qui griffe =====
+    const kitten = document.querySelector('.kitten');
+
+    const PAW_SVG =
+      '<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg">' +
+      '<ellipse cx="50" cy="63" rx="27" ry="23" fill="#aab0b6"/>' +
+      '<ellipse cx="50" cy="67" rx="17" ry="13" fill="#f7c8d8"/>' +
+      '<ellipse cx="27" cy="40" rx="9" ry="12" fill="#aab0b6"/>' +
+      '<ellipse cx="43" cy="29" rx="9" ry="12" fill="#aab0b6"/>' +
+      '<ellipse cx="59" cy="29" rx="9" ry="12" fill="#aab0b6"/>' +
+      '<ellipse cx="75" cy="40" rx="9" ry="12" fill="#aab0b6"/>' +
+      '</svg>';
+
+    const SCRATCH_SVG =
+      '<svg viewBox="0 0 80 80" width="78" height="78" xmlns="http://www.w3.org/2000/svg">' +
+      '<path d="M12 14 L40 62" stroke="#ff5e9c" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M30 8 L58 56" stroke="#ff9ec4" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '<path d="M48 12 L72 54" stroke="#ff5e9c" stroke-width="4" fill="none" stroke-linecap="round"/>' +
+      '</svg>';
+
+    function clawAt(x, y) {
+      const paw = document.createElement('div');
+      paw.className = 'paw';
+      paw.style.left = x + 'px';
+      paw.style.top = y + 'px';
+      paw.innerHTML = PAW_SVG;
+      document.body.appendChild(paw);
+      setTimeout(function () { paw.remove(); }, 600);
+
+      const scr = document.createElement('div');
+      scr.className = 'scratch';
+      scr.style.left = x + 'px';
+      scr.style.top = y + 'px';
+      scr.innerHTML = SCRATCH_SVG;
+      document.body.appendChild(scr);
+      setTimeout(function () { scr.remove(); }, 520);
+
+      // petit sursaut rigolo du chaton
+      kitten.classList.remove('wiggle');
+      void kitten.offsetWidth;
+      kitten.classList.add('wiggle');
+    }
+
+    function pokeKitten(e) {
+      e.preventDefault();
+      let x, y;
+      if (e.touches && e.touches[0]) {
+        x = e.touches[0].clientX;
+        y = e.touches[0].clientY;
+      } else {
+        x = e.clientX;
+        y = e.clientY;
+      }
+      clawAt(x, y);
+    }
+
+    kitten.addEventListener('click', pokeKitten);
+    kitten.addEventListener('touchstart', pokeKitten, { passive: false });
+    kitten.addEventListener('animationend', function () {
+      kitten.classList.remove('wiggle');
+    });
+  </script>
+</body>
+</html>
